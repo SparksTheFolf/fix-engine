@@ -31,6 +31,7 @@ app.post('/convert-to-fix-deparsed', (req, res) => {
 });
 
 
+
 app.post('/fix', (req, res) => {
     const stockData = req.body;
 
