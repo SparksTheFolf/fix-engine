@@ -1,6 +1,13 @@
 # fix-engine
 FIX Protocol
 
+[![Node.js Package](https://github.com/SparksTheFolf/fix-engine/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/SparksTheFolf/fix-engine/actions/workflows/npm-publish.yml)
+
+## Installation
+```bash
+npm install fix-engine
+```
+
 
 ### FIX Protocol
 The Financial Information eXchange (FIX) Protocol is a series of messaging specifications for the electronic communication of trade-related messages. It has been developed through the collaboration of banks, broker-dealers, exchanges, industry utilities and associations, institutional investors, and information technology providers from around the world. These market participants share a vision of a common, global language for the automated trading of financial instruments. The FIX Protocol is a way to standardize the message flow between parties and is a key component in the straight-through processing of trades.
