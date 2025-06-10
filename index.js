@@ -39,6 +39,7 @@ app.post('/fix', (req, res) => {
     if (!stockData.symbol || !stockData.price || !stockData.quantity || !stockData.clOrdId) {
         return res.status(400).json({ error: 'Missing required stock data: symbol, price, quantity, or clOrdId' });
     }
+    
 
     // Convert to FIX format
     const fixMessage = formatFixMessage(stockData);

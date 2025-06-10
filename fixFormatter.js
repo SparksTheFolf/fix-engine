@@ -1,4 +1,17 @@
-const moment = require('moment');
+const { format } = require('date-fns');
+
+/**
+ * Returns UTC time formatted for FIX message (YYYYMMDD-HH:MM:SS.ssssss)
+ * Accurate to ~10,000th of a second.
+ */
+function getSendingTimeUTC() {
+    const now = new Date();
+    const [sec, nano] = process.hrtime();
+    const microseconds = Math.floor(nano / 1000); // to microseconds
+    const baseTime = format(now, 'yyyyMMdd-HH:mm:ss');
+    const fractional = String(microseconds).padStart(6, '0').slice(0, 6); // 6-digit subsecond
+    return `${baseTime}.${fractional}`;
+}
 
 /**
  * Converts stock data into FIX protocol format.
@@ -12,19 +25,18 @@ const moment = require('moment');
  */
 function formatFixMessage(stockData) {
     const { symbol, price, quantity, clOrdId, ordStatus } = stockData;
-    const sendingTime = moment().utc().format('YYYYMMDD-HH:mm:ss.SSS'); // UTC time in FIX format
+    const sendingTime = getSendingTimeUTC();
 
-    // Standard FIX fields for a stock trade message
     const fixMessage = [
-        `8=FIX.4.4`,                // BeginString
-        `35=D`,                     // MsgType (New Order - Single)
-        `11=${clOrdId}`,            // ClOrdID (Client Order ID)
-        `55=${symbol}`,             // Symbol
-        `44=${price}`,              // Price
-        `38=${quantity}`,           // OrderQty
-        `54=1`,                     // Side (1 = Buy)
-        `39=${ordStatus}`,          // OrdStatus (Order status)
-        `52=${sendingTime}`,        // SendingTime
+        `8=FIX4.4`,                // BeginString
+        `35=D`,                    // MsgType (New Order - Single)
+        `11=${clOrdId}`,           // ClOrdID (Client Order ID)
+        `55=${symbol}`,            // Symbol
+        `44=${price}`,             // Price
+        `38=${quantity}`,          // OrderQty
+        `54=1`,                    // Side (1 = Buy)
+        `39=${ordStatus}`,         // OrdStatus (Order status)
+        `52=${sendingTime}`,       // SendingTime
         `10=${calculateChecksum(symbol, price, quantity, clOrdId, ordStatus, sendingTime)}` // Checksum
     ].join('|');
 
@@ -47,7 +59,7 @@ function explainFixMessage(fixMessage) {
         '54': 'Side (1 = Buy, 2 = Sell)',
         '39': 'OrdStatus (Order status: 0 = New, 1 = Partially Filled, 2 = Filled)',
         '52': 'SendingTime (Time the message is sent in UTC)',
-        '10': 'Checksum (Message integrity check)'
+        '10': 'Checksum (Simple checksum for the message)'
     };
 
     return fixMessage.split('|').map((field) => {
